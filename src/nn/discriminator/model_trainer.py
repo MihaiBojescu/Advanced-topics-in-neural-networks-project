@@ -1,5 +1,5 @@
-import torch
 import time
+import torch
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
@@ -44,8 +44,8 @@ class DiscriminatorTrainer:
         for entry in batched_dataloader:
             real_image, _ = entry
             fake_image = self.__generator(x=torch.rand(real_image.shape))
-            real_image_target = torch.zeros(real_image.shape).fill_(0.85)
-            fake_image_target = torch.zeros(real_image.shape).fill_(0.00)
+            real_image_target = torch.zeros((real_image.shape[0], 1)).fill_(0.85)
+            fake_image_target = torch.zeros((real_image.shape[0], 1)).fill_(0.00)
 
             real_image = real_image.to(device=self.__device, non_blocking=self.__device == "cuda")
             fake_image = fake_image.to(device=self.__device, non_blocking=self.__device == "cuda")
