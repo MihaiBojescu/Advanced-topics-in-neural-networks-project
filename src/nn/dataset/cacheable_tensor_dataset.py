@@ -36,7 +36,7 @@ class CacheableTensorDataset(Dataset):
 
         for file in files:
             tensor = torch.load(f"{cache_path}/{file}")
-            cache.append(tensor)
+            cache.append((tensor, os.path.splitext(file)[0]))
 
         return tuple(cache)
 
@@ -47,8 +47,8 @@ class CacheableTensorDataset(Dataset):
         if not os.path.exists(cache_path):
             os.mkdir(cache_path)
 
-        for i, tensor in enumerate(cache):
-            torch.save(tensor, f"{cache_path}/{i}.pt")
+        for tensor, name in cache:
+            torch.save(tensor, f"{cache_path}/{name}.pt")
 
     def __len__(self) -> int:
         return len(self.__cache)
