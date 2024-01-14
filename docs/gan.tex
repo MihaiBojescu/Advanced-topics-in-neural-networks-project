@@ -43,16 +43,29 @@
 \maketitle
 
 \begin{abstract}
-    This document contains on how Generative Neural Networks could be applied in order to transform noise into artwork
-    inspired by renoun artists.
+    This document contains a study on how Generative Neural Networks could be applied in order to transform noise into artwork
+    inspired by renoun artists. The architecture of the Network consists of a Convolutional Neural Network for the discriminator
+    and a U-Net Convolutional Neural Network for the genetrator. The data on which the network is trained is a dataset with
+    faimous paintings by Jean Monnet.   
 \end{abstract}
 
 \begin{IEEEkeywords}
-    Generative Neural Networks, GANs
+    Generative Neural Networks, GANs, Convolutional Neural Networks, U-Nets.
 \end{IEEEkeywords}
 
 \section{Introduction}
-TBD
+    In this document, we will study how GANs could be used to generate pieces of art in the Jean Monnet style. GANs have shown
+remarkable success in generating realistic images by using random noise as input, and we aim to use them as an application
+for producing fine art.
+
+    Monnet's paintings are characterised by their vibrant colors and expressive brushwork, and we will try to replicate this
+signature in the pictures that the GAN produces, effectively creating a 'digital Monnet'. The model will play by rotation
+the role of an art critic and an artist in order to improve itself until - as an art critic - it cannot distinguish between
+real, pre-existing art and newly created art.
+
+    During the building of this model, several intriguing questions were raised, ranging from the possibility of intersecting
+arts with artificial intelligence, to the creativity and the originality of said results. What would the implications of using
+such models in the industry of arts be? This paper also will explore the ethical implications of computer-generated craft.
 
 \begin{thebibliography}{00}
     \bibitem{b1} I. J. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, Y. Bengie
