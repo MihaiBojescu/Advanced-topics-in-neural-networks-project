@@ -10,14 +10,14 @@ class Discriminator(torch.nn.Module):
         self.__device = device
 
         self.__conv_1 = torch.nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1, device=device)
-        self.__batch_norm_1 = torch.nn.BatchNorm2d(32, device=device)
-        self.__conv_2 = torch.nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, device=device)
-        self.__batch_norm_2 = torch.nn.BatchNorm2d(64, device=device)
-        self.__conv_3 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, device=device)
-        self.__batch_norm_3 = torch.nn.BatchNorm2d(128, device=device)
-        self.__conv_4 = torch.nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1, device=device)
-        self.__batch_norm_4 = torch.nn.BatchNorm2d(256, device=device)
-        self.__conv_5 = torch.nn.Conv2d(256, 1, kernel_size=2, stride=1, padding=0, device=device)
+        self.__batch_norm_1 = torch.nn.BatchNorm2d(64, device=device)
+        self.__conv_2 = torch.nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, device=device)
+        self.__batch_norm_2 = torch.nn.BatchNorm2d(128, device=device)
+        self.__conv_3 = torch.nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1, device=device)
+        self.__batch_norm_3 = torch.nn.BatchNorm2d(256, device=device)
+        self.__conv_4 = torch.nn.Conv2d(256, 512, kernel_size=3, stride=2, padding=1, device=device)
+        self.__batch_norm_4 = torch.nn.BatchNorm2d(512, device=device)
+        self.__conv_5 = torch.nn.Conv2d(512, 1, kernel_size=2, stride=1, padding=0, device=device)
 
         self.__activation_function = torch.nn.ReLU()
         self.__output_activation_function = torch.nn.Sigmoid()
