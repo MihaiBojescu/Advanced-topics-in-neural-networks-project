@@ -23,7 +23,7 @@ class Discriminator(torch.nn.Module):
         self.__output_activation_function = torch.nn.Sigmoid()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.to(self.__device)
+        x = x.to(device=self.__device, non_blocking=self.__device == "cuda")
 
         x = self.__activation_function(self.__batch_norm_1(self.__conv_1(x)))
         x = self.__activation_function(self.__batch_norm_2(self.__conv_2(x)))
