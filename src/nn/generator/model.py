@@ -6,8 +6,8 @@ from torch import nn
 class Generator(nn.Module):
     __device: torch.device
 
-    def __init__(self, device: torch.device = torch.device("cpu"), *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, device: torch.device = torch.device("cpu")) -> None:
+        super().__init__(*args)
 
         self.__device = device
 

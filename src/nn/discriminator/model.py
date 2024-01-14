@@ -4,8 +4,8 @@ import torch
 class Discriminator(torch.nn.Module):
     __device: torch.device
 
-    def __init__(self, device: torch.device, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, device: torch.device):
+        super().__init__(*args)
 
         self.__device = device
 
