@@ -162,3 +162,7 @@ cython_debug/
 # Project files
 data/datasets/
 data/cache/
+docs/*.aux
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.synctex.gz
