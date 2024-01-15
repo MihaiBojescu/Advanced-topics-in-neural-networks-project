@@ -55,6 +55,8 @@ class GanTrainer:
             log_callback("generator_loss", generator_loss_total, epoch+1)
             log_callback("summed_loss", summed_loss_total, epoch+1)
 
+        self.__discriminator_trainer.export()
+        self.__generator_trainer.export()
 
     def __add_discriminator_checkpoint(self, epoch: int, loss: torch.Tensor) -> None:
         if self.__best_discriminator_loss is None:
