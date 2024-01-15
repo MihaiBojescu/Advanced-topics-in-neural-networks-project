@@ -1,16 +1,20 @@
 import torch
+from torch.nn import Module
 from torch.nn.modules.loss import _Loss
 from torch.autograd import Variable, grad
 
 
 class WassersteinWithGradientPenaltyLoss(_Loss):
     __gradient_penalty_rate: float
+    __discriminator: Module
 
     def __init__(
         self,
         gradient_penalty_rate: float,
+        discriminator: Module,
     ) -> None:
         self.__gradient_penalty_rate = gradient_penalty_rate
+        self.__discriminator = discriminator
 
     def forward(
         self,
