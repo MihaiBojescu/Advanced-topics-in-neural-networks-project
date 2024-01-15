@@ -19,5 +19,5 @@ jobs:
           path: "."
           remote_path: ${{ vars.DEPLOY_HOST_PATH }}
           remote_host: ${{ vars.DEPLOY_HOST_IP }}
-          remote_user: ${{ secrets.DEPLOY_HOST_USER }}
+          remote_user: ${{ vars.DEPLOY_HOST_USER }}
           remote_key: ${{ secrets.DEPLOY_HOST_KEY }}
