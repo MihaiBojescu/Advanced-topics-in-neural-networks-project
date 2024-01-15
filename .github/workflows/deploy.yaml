@@ -1,0 +1,19 @@
+name: Deploy to cloud GPU instance
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          mkdir -p $HOME/.ssh
+          echo "{{ secrets.DEPLOY_HOST_KEY }}" > $HOME/.ssh/key
+          chmod 600 $HOME/.ssh/key
+
+          rsync -azvr -e "ssh -i $HOME/.ssh/key" $GITHUB_WORKSPACE {{ vars.DEPLOY_HOST_USER }}@{{ vars.DEPLOY_HOST_IP }}:{{ vars.DEPLOY_HOST_PATH }}
