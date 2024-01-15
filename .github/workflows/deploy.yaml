@@ -5,19 +5,15 @@ on:
     branches:
       - main
 
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production
     steps:
       - uses: actions/checkout@v3
-      - name: rsync deployment
-        uses: burnett01/rsync-deployments@6.0.0
-        with:
-          switches: -avzr
-          path: "."
-          remote_path: ${{ vars.DEPLOY_HOST_PATH }}
-          remote_host: ${{ vars.DEPLOY_HOST_IP }}
-          remote_user: ${{ vars.DEPLOY_HOST_USER }}
-          remote_key: ${{ secrets.DEPLOY_HOST_KEY }}
+      - run: |
+          mkdir -p $HOME/.ssh
+          echo "{{ secrets.DEPLOY_HOST_KEY }}" > $HOME/.ssh/key
+          chmod 600 $HOME/.ssh/key
+
+          rsync -azvr -e "ssh -i $HOME/.ssh/key" $GITHUB_WORKSPACE {{ vars.DEPLOY_HOST_USER }}@{{ vars.DEPLOY_HOST_IP }}:{{ vars.DEPLOY_HOST_PATH }}
