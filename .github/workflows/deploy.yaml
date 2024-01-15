@@ -9,11 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production
+    env:
+      DEPLOY_HOST_IP: ${{ vars.DEPLOY_HOST_IP }}
+      DEPLOY_HOST_USER: ${{ vars.DEPLOY_HOST_USER }}
+      DEPLOY_HOST_KEY: ${{ secrets.DEPLOY_HOST_KEY }}
+      DEPLOY_HOST_PATH: ${{ vars.DEPLOY_HOST_PATH }}
     steps:
       - uses: actions/checkout@v3
       - run: |
           mkdir -p $HOME/.ssh
-          echo "{{ secrets.DEPLOY_HOST_KEY }}" > $HOME/.ssh/key
+          echo $DEPLOY_HOST_KEY > $HOME/.ssh/key
           chmod 600 $HOME/.ssh/key
 
-          rsync -azvr -e "ssh -i $HOME/.ssh/key" $GITHUB_WORKSPACE {{ vars.DEPLOY_HOST_USER }}@{{ vars.DEPLOY_HOST_IP }}:{{ vars.DEPLOY_HOST_PATH }}
+          rsync -azvr -e "ssh -i $HOME/.ssh/key" $GITHUB_WORKSPACE $DEPLOY_HOST_USER@$DEPLOY_HOST_IP:$DEPLOY_HOST_PATH
