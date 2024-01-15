@@ -24,12 +24,10 @@ class DiscriminatorTrainer:
     ) -> None:
         self.__discriminator = discriminator
         self.__generator = generator
-        self.__loss_function = loss_function()
+        self.__loss_function = loss_function
         self.__optimizer = optimizer(self.__discriminator.parameters(), lr=learning_rate)
         self.__device = device
         self.__exports_path = exports_path
-
-        self.__loss_function = self.__loss_function.to(device=self.__device, non_blocking=self.__device == "cuda")
 
     def run(self, real_image_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()

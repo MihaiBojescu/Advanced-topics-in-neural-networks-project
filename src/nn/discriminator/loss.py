@@ -1,22 +1,24 @@
 import torch
 from torch.nn import Module
-from torch.nn.modules.loss import _Loss
 from torch.autograd import Variable, grad
 
 
-class WassersteinWithGradientPenaltyLoss(_Loss):
+class WassersteinWithGradientPenaltyLoss:
     __gradient_penalty_rate: float
     __discriminator: Module
+    __device: torch.device
 
     def __init__(
         self,
         gradient_penalty_rate: float,
         discriminator: Module,
+        device: torch.device = torch.device("cpu")
     ) -> None:
         self.__gradient_penalty_rate = gradient_penalty_rate
         self.__discriminator = discriminator
+        self.__device = device
 
-    def forward(
+    def __call__(
         self,
         real_image: torch.Tensor,
         fake_image: torch.Tensor,
