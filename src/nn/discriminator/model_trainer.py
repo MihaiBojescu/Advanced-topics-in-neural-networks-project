@@ -3,14 +3,11 @@ import torch
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
-from torch.utils.data import DataLoader
-
 
 class DiscriminatorTrainer:
     __discriminator: Module
-    __discriminator: Module
     __loss_function: torch.nn.modules.loss._Loss
-    __optimiser: torch.optim.Optimizer
+    __optimizer: torch.optim.Optimizer
     __device: torch.device
     __exports_path: str
 
@@ -19,7 +16,7 @@ class DiscriminatorTrainer:
         discriminator: Module,
         generator: Module,
         loss_function: _Loss,
-        optimiser: Optimizer,
+        optimizer: Optimizer,
         learning_rate: float,
         device: torch.device = torch.device("cpu"),
         exports_path: str = "/tmp",
@@ -27,7 +24,7 @@ class DiscriminatorTrainer:
         self.__discriminator = discriminator
         self.__generator = generator
         self.__loss_function = loss_function()
-        self.__optimiser = optimiser(self.__discriminator.parameters(), lr=learning_rate)
+        self.__optimizer = optimizer(self.__discriminator.parameters(), lr=learning_rate)
         self.__device = device
         self.__exports_path = exports_path
 
@@ -46,14 +43,14 @@ class DiscriminatorTrainer:
         real_image_target = real_image_target.to(device=self.__device, non_blocking=self.__device == "cuda")
         fake_image_target = fake_image_target.to(device=self.__device, non_blocking=self.__device == "cuda")
 
-        self.__optimiser.zero_grad()
+        self.__optimizer.zero_grad()
         real_image_result = self.__discriminator(x=real_image)
         fake_image_result = self.__discriminator(x=fake_image)
         loss = self.__loss_function(fake_image_result, fake_image_target) - self.__loss_function(
             real_image_result, real_image_target
         )
         loss.backward()
-        self.__optimiser.step()
+        self.__optimizer.step()
 
         return loss
 
