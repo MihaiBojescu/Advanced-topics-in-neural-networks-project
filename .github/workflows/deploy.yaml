@@ -14,4 +14,4 @@ jobs:
       - run: mkdir -p $HOME/.ssh
       - run: echo "${{ secrets.DEPLOY_HOST_KEY }}" > $HOME/.ssh/key
       - run: chmod 600 $HOME/.ssh/key
-      - run: rsync -azvr -vvv -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE ${{ vars.DEPLOY_HOST_USER }}@${{ vars.DEPLOY_HOST_IP }}:${{ vars.DEPLOY_HOST_PATH }}
+      - run: rsync -azvr -vvv -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE ubuntu@${{ vars.DEPLOY_HOST_IP }}:${{ vars.DEPLOY_HOST_PATH }}
