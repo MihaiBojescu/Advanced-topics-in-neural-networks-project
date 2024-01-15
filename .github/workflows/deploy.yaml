@@ -1,8 +1,9 @@
 name: Deploy to cloud GPU instance
 on:
+  workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 
 jobs:
