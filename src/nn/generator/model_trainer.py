@@ -1,3 +1,4 @@
+import os
 import time
 import torch
 from torch.nn.modules.loss import _Loss
@@ -50,4 +51,5 @@ class GeneratorTrainer:
         return loss
 
     def export(self) -> None:
+        os.makedirs(self.__exports_path, exist_ok=True)
         torch.save(self.__generator.state_dict(), f"{self.__exports_path}/generator_{time.time_ns()}.pt")

@@ -28,10 +28,15 @@ class GanTrainer:
         self.__best_discriminator_loss = None
         self.__best_generator_loss = None
 
-    def run(self, epochs: int, batched_images_dataloader: DataLoader):
+    def run(self, epochs: int, batched_images_dataloader: DataLoader, log_callback):
         epoch_progress_bar = tqdm(range(epochs), desc="Training")
 
         for epoch in epoch_progress_bar:
+
+            discriminator_loss_total = 0
+            generator_loss_total = 0
+            summed_loss_total = 0
+
             for batch_index, image_batch in enumerate(batched_images_dataloader):
                 discriminator_loss = self.__discriminator_trainer.run(real_image_batch=image_batch)
                 self.__add_discriminator_checkpoint(epoch=epoch, loss=discriminator_loss)
@@ -41,6 +46,15 @@ class GanTrainer:
 
                 generator_loss = self.__generator_trainer.run(size=image_batch.shape)
                 self.__add_generator_checkpoint(epoch=epoch, loss=generator_loss)
+
+                discriminator_loss_total += discriminator_loss
+                generator_loss_total += generator_loss
+                summed_loss_total = discriminator_loss_total + generator_loss_total
+            
+            log_callback("discriminator_loss", discriminator_loss_total, epoch+1)
+            log_callback("generator_loss", generator_loss_total, epoch+1)
+            log_callback("summed_loss", summed_loss_total, epoch+1)
+
 
     def __add_discriminator_checkpoint(self, epoch: int, loss: torch.Tensor) -> None:
         if self.__best_discriminator_loss is None:

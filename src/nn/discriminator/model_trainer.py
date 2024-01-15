@@ -1,5 +1,6 @@
 import time
 import torch
+import os
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
@@ -64,4 +65,5 @@ class DiscriminatorTrainer:
         return discriminator_loss
 
     def export(self) -> None:
+        os.makedirs(self.__exports_path, exist_ok=True)
         torch.save(self.__discriminator.state_dict(), f"{self.__exports_path}/discriminator_{time.time_ns()}.pt")
