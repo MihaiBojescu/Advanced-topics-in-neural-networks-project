@@ -1,5 +1,6 @@
 import time
 import torch
+import typing as t
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
 from torch.optim import Optimizer
@@ -63,5 +64,6 @@ class DiscriminatorTrainer:
 
         return discriminator_loss
 
-    def export(self) -> None:
-        torch.save(self.__discriminator.state_dict(), f"{self.__exports_path}/discriminator_{time.time_ns()}.pt")
+    def export(self, epoch: t.Optional[int]) -> None:
+        epoch_string = f"{epoch}_" if epoch is not None else ""
+        torch.save(self.__discriminator.state_dict(), f"{self.__exports_path}/discriminator_{epoch_string}{time.time_ns()}.pt")

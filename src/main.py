@@ -22,7 +22,7 @@ def wandb_sweep():
     transforms = Compose([
         Resize([32, 32]),
         RandomHorizontalFlip(),
-        RandomVerticalFlip()
+        RandomVerticalFlip(),
     ])
 
     dataset = ImageTensorDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
@@ -46,9 +46,10 @@ def wandb_sweep():
     discriminator_trainer = DiscriminatorTrainer(
         discriminator=discriminator,
         generator=generator,
-        loss_function=discriminator_loss_function,
         optimizer=discriminator_optimizer,
+        loss_function=discriminator_loss_function,
         learning_rate=discriminator_learning_rate,
+        exports_path="./data/exports",
         device=device
     )
 
@@ -57,8 +58,9 @@ def wandb_sweep():
         generator=generator,
         optimizer=generator_optimizer,
         loss_function=generator_loss_function,
+        learning_rate=generator_learning_rate,
+        exports_path="./data/exports",
         device=device,
-        learning_rate=generator_learning_rate
     )
 
     gan_trainer = GanTrainer(

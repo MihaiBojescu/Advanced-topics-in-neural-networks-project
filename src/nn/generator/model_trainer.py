@@ -1,5 +1,6 @@
 import time
 import torch
+import typing as t
 from torch.nn.modules.loss import _Loss
 from nn.discriminator.model import Discriminator
 from nn.generator.model import Generator
@@ -49,5 +50,6 @@ class GeneratorTrainer:
 
         return loss
 
-    def export(self) -> None:
-        torch.save(self.__generator.state_dict(), f"{self.__exports_path}/generator_{time.time_ns()}.pt")
+    def export(self, epoch: t.Optional[int]) -> None:
+        epoch_string = f"{epoch}_" if epoch is not None else ""
+        torch.save(self.__generator.state_dict(), f"{self.__exports_path}/generator_{epoch_string}{time.time_ns()}.pt")
