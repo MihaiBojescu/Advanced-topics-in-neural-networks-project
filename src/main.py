@@ -1,4 +1,7 @@
 import torch
+from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip
+from torch.utils.data.dataloader import DataLoader
+from nn.dataset.cacheable_tensor_dataset import CacheableTensorDataset
 from nn.util.device import get_default_device
 from nn.common.gan_trainer import GanTrainer
 from nn.dataset.image_tensor_dataset import ImageTensorDataset
@@ -15,6 +18,17 @@ def wandb_sweep():
     #constants
     device = get_default_device()
     
+    # Resize transform will be used to test the model. Will be removed afterwards.
+    transforms = Compose([
+        Resize([32, 32]),
+        RandomHorizontalFlip(),
+        RandomVerticalFlip()
+    ])
+
+    dataset = ImageTensorDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
+    cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
+    batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=32)
+
     #vars
     discriminator_loss_function = torch.nn.CrossEntropyLoss
     discriminator_optimizer = torch.optim.Adam
@@ -53,10 +67,8 @@ def wandb_sweep():
         generator_trainer_run_frequency=generator_trainer_run_frequency
     )
 
-    gan_trainer.run(10, get_dataloader())
+    gan_trainer.run(10, batched_image_dataloader)
     
-def get_dataloader():
-    return ImageTensorDataset(data_path="./data/datasets/monet_jpg")
 
 if __name__ == "__main__":
     main()
