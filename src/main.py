@@ -1,12 +1,12 @@
-import torch
-from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip
-from torch.utils.data.dataloader import DataLoader
 import wandb
+import torch
+from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip, ToDtype
+from torch.utils.data.dataloader import DataLoader
 from nn.dataset.cacheable_tensor_dataset import CacheableTensorDataset
 from nn.discriminator.loss import WassersteinWithGradientPenaltyLoss
 from nn.util.device import get_default_device
 from nn.common.gan_trainer import GanTrainer
-from nn.dataset.image_tensor_dataset import ImageTensorDataset
+from nn.dataset.image_dataset import ImageDataset
 from nn.discriminator.model import Discriminator
 from nn.discriminator.model_trainer import DiscriminatorTrainer
 from nn.generator.model import Generator
@@ -98,10 +98,11 @@ def wandb_run():
         transforms = Compose([
             Resize([32, 32]),
             RandomHorizontalFlip(),
-            RandomVerticalFlip()
+            RandomVerticalFlip(),
+            ToDtype(torch.float32, scale=True)
         ])
 
-        dataset = ImageTensorDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
+        dataset = ImageDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
         batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size)
 

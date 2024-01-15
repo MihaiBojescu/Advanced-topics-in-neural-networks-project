@@ -2,11 +2,11 @@ import os
 import torch
 import typing as t
 from torch.utils.data import Dataset
-from torchvision.transforms.v2 import Compose, ToImage, ToDtype
+from torchvision.transforms.v2 import ToImage
 from PIL import Image
 
 
-class ImageTensorDataset(Dataset):
+class ImageDataset(Dataset):
     __transforms: t.Optional[t.Callable[[torch.Tensor], torch.Tensor]]
     __data: t.List[t.Tuple[torch.Tensor, str]]
 
@@ -23,7 +23,7 @@ class ImageTensorDataset(Dataset):
 
     def __load_data(self, data_path: str) -> t.List[torch.Tensor]:
         data: t.List[torch.Tensor] = []
-        transform = Compose([ToImage(), ToDtype(torch.float32, scale=True)])
+        transform = ToImage()
         files = os.listdir(data_path)
 
         for file in files:
