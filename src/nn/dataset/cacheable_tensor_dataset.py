@@ -18,7 +18,7 @@ class CacheableTensorDataset(Dataset):
             self.__cache = self.__load_cache(cache_path)
             return
 
-        self.__cache = (entry for entry in dataset)
+        self.__cache = tuple(entry for entry in dataset)
         self.__save_cache(self.__cache, cache_path)
 
     def __is_cache_available(self, dataset: Dataset, cache_path: t.Optional[str]):
