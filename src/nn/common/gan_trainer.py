@@ -10,8 +10,8 @@ class GanTrainer:
     __discriminator_trainer: DiscriminatorTrainer
     __generator_trainer: GeneratorTrainer
     __generator_trainer_run_frequency: int
-    __best_generator_loss: torch.Tensor
-    __best_discriminator_loss: torch.Tensor
+    __best_discriminator_loss: t.Optional[torch.Tensor]
+    __best_generator_loss: t.Optional[torch.Tensor]
     __checkpoint_epoch_threshold: t.Optional[int]
 
     def __init__(
@@ -25,6 +25,8 @@ class GanTrainer:
         self.__generator_trainer = generator_trainer
         self.__generator_trainer_run_frequency = generator_trainer_run_frequency
         self.__checkpoint_epoch_threshold = checkpoint_epoch_threshold
+        self.__best_discriminator_loss = None
+        self.__best_generator_loss = None
 
     def run(self, epochs: int, batched_images_dataloader: DataLoader):
         epoch_progress_bar = tqdm(range(epochs), desc="Training")
@@ -41,6 +43,9 @@ class GanTrainer:
                 self.__add_generator_checkpoint(epoch=epoch, loss=generator_loss)
 
     def __add_discriminator_checkpoint(self, epoch: int, loss: torch.Tensor) -> None:
+        if self.__best_discriminator_loss is None:
+            self.__best_discriminator_loss = loss
+
         if torch.greater_equal(loss, self.__best_discriminator_loss) or epoch < self.__checkpoint_epoch_threshold:
             return
 
@@ -48,6 +53,9 @@ class GanTrainer:
         self.__discriminator_trainer.export()
 
     def __add_generator_checkpoint(self, epoch: int, loss: torch.Tensor) -> None:
+        if self.__best_generator_loss is None:
+            self.__best_generator_loss = loss
+
         if torch.greater_equal(loss, self.__best_generator_loss) or epoch < self.__checkpoint_epoch_threshold:
             return
 
