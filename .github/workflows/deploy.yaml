@@ -21,4 +21,4 @@ jobs:
           echo $DEPLOY_HOST_KEY > $HOME/.ssh/key
           chmod 600 $HOME/.ssh/key
 
-          rsync -azvr -e "ssh -i $HOME/.ssh/key" $GITHUB_WORKSPACE $DEPLOY_HOST_USER@$DEPLOY_HOST_IP:$DEPLOY_HOST_PATH
+          rsync -azvr -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE $DEPLOY_HOST_USER@$DEPLOY_HOST_IP:$DEPLOY_HOST_PATH
