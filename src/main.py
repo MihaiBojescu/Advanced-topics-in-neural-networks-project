@@ -1,4 +1,5 @@
 import torch
+from nn.util.device import get_default_device
 from nn.common.gan_trainer import GanTrainer
 from nn.dataset.image_tensor_dataset import ImageTensorDataset
 from nn.discriminator.model import Discriminator
@@ -9,11 +10,10 @@ from nn.generator.model_trainer import GeneratorTrainer
 
 def main():
     wandb_sweep()
-    pass
 
 def wandb_sweep():
     #constants
-    device = get_device()
+    device = get_default_device()
     
     #vars
     discriminator_loss_function = torch.nn.CrossEntropyLoss
@@ -54,16 +54,6 @@ def wandb_sweep():
     )
 
     gan_trainer.run(10, get_dataloader())
-
-    pass
-
-def get_device():
-    if torch.cuda.is_available():
-        return torch.device('cuda')
-    elif torch.backends.mps.is_available():
-        return torch.device('mos')
-    else:
-        return torch.device('cpu')
     
 def get_dataloader():
     return ImageTensorDataset(data_path="./data/datasets/monet_jpg")
