@@ -16,9 +16,7 @@ jobs:
       DEPLOY_HOST_PATH: ${{ vars.DEPLOY_HOST_PATH }}
     steps:
       - uses: actions/checkout@v3
-      - run: |
-          mkdir -p $HOME/.ssh
-          echo "$DEPLOY_HOST_KEY" > $HOME/.ssh/key
-          chmod 600 $HOME/.ssh/key
-
-          rsync -azvr -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" "$GITHUB_WORKSPACE" "$DEPLOY_HOST_USER"@"$DEPLOY_HOST_IP":"$DEPLOY_HOST_PATH"
+      - run: mkdir -p $HOME/.ssh
+      - run: echo "$DEPLOY_HOST_KEY" > $HOME/.ssh/key
+      - run: chmod 600 $HOME/.ssh/key
+      - run: rsync -azvr -vvv -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE $DEPLOY_HOST_USER@$DEPLOY_HOST_IP:$DEPLOY_HOST_PATH
