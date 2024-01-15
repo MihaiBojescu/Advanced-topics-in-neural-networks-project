@@ -1,0 +1,20 @@
+name: Deploy to cloud GPU instance
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: rsync deployment
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr
+          path: "."
+          remote_path: ${{ env.DEPLOY_HOST_PATH }}
+          remote_host: ${{ env.DEPLOY_HOST_IP }}
+          remote_user: ${{ secrets.DEPLOY_HOST_USER }}
+          remote_key: ${{ secrets.DEPLOY_HOST_KEY }}
