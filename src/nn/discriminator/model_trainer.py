@@ -53,12 +53,9 @@ class DiscriminatorTrainer:
         fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
         # Uncomment if wasserstein distance with gradient penalty loss will be used
-        # discriminator_loss = self.__loss_function(
-        #     real_image_batch, fake_image_batch, real_image_batch_discriminated, fake_image_batch_discriminated
-        # )
         discriminator_loss = self.__loss_function(
-            real_image_batch_discriminated, real_image_batch_target
-        ) + self.__loss_function(fake_image_batch_discriminated, fake_image_batch_target)
+            real_image_batch, fake_image_batch, real_image_batch_discriminated, fake_image_batch_discriminated
+        )
         discriminator_loss.backward()
         self.__optimizer.step()
 

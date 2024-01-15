@@ -4,6 +4,7 @@ from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, Rando
 from torch.utils.data.dataloader import DataLoader
 from nn.dataset.cacheable_tensor_dataset import CacheableTensorDataset
 from nn.discriminator.loss import WassersteinWithGradientPenaltyLoss
+from nn.generator.loss import WassersteinLoss
 from nn.util.device import get_default_device
 from nn.common.gan_trainer import GanTrainer
 from nn.dataset.image_dataset import ImageDataset
@@ -49,21 +50,22 @@ def main():
 
 def wandb_run():
     with wandb.init():
-
         device = get_default_device()
         generator = Generator(device=device)
         discriminator = Discriminator(device=device)
 
-        #vars
-        discriminator_learning_rate  = wandb.config.discriminator_learning_rate
-        generator_learning_rate  = wandb.config.generator_learning_rate
-        generator_trainer_run_frequency  = wandb.config.generator_trainer_run_frequency
+        # vars
+        discriminator_learning_rate = wandb.config.discriminator_learning_rate
+        generator_learning_rate = wandb.config.generator_learning_rate
+        generator_trainer_run_frequency = wandb.config.generator_trainer_run_frequency
         batch_size = wandb.config.batch_size
         gradient_penalty_rate = wandb.config.gradient_penalty_rate
-        
-        discriminator_loss_function = torch.nn.CrossEntropyLoss #WassersteinWithGradientPenaltyLoss(discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device)
+
+        discriminator_loss_function = lambda: WassersteinWithGradientPenaltyLoss(
+            discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
+        )
         discriminator_optimizer = torch.optim.Adam
-        generator_loss_function = torch.nn.BCELoss
+        generator_loss_function = WassersteinLoss
         generator_optimizer = torch.optim.Adam
 
         discriminator_trainer = DiscriminatorTrainer(
