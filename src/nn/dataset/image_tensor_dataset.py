@@ -21,8 +21,8 @@ class ImageTensorDataset(Dataset):
         self.__transforms = transforms
         self.__data = self.__load_data(data_path)
 
-    def __load_data(self, data_path: str) -> t.List[t.Tuple[torch.Tensor, str]]:
-        data: t.List[t.Tuple[torch.Tensor, str]] = []
+    def __load_data(self, data_path: str) -> t.List[torch.Tensor]:
+        data: t.List[torch.Tensor] = []
         transform = Compose([ToImage(), ToDtype(torch.float32, scale=True)])
         files = os.listdir(data_path)
 
@@ -36,10 +36,10 @@ class ImageTensorDataset(Dataset):
     def __len__(self) -> int:
         return len(self.__data)
 
-    def __getitem__(self, index) -> t.Tuple[torch.Tensor, str]:
-        tensor, name = self.__data[index]
+    def __getitem__(self, index) -> torch.Tensor:
+        tensor, _ = self.__data[index]
 
         if self.__transforms:
             tensor = self.__transforms(tensor)
 
-        return tensor, name
+        return tensor

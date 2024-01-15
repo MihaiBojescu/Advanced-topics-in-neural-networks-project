@@ -1,5 +1,6 @@
 import time
 import torch
+from torch.nn.modules.loss import _Loss
 from nn.discriminator.model import Discriminator
 from nn.generator.model import Generator
 
@@ -7,8 +8,8 @@ from nn.generator.model import Generator
 class GeneratorTrainer:
     __discriminator: Discriminator
     __generator: Generator
+    __loss_function: torch.nn.Module
     __optimizer: torch.optim.Optimizer
-    __criterion: torch.nn.Module
     __device: torch.device
     __exports_path: str
 
@@ -16,16 +17,16 @@ class GeneratorTrainer:
         self,
         discriminator: Discriminator,
         generator: Generator,
+        loss_function: _Loss,
         optimizer: torch.optim.Optimizer,
-        criterion: torch.nn.Module,
         device: torch.device,
         learning_rate: float,
         exports_path: str = "/tmp",
     ) -> None:
         self.__discriminator = discriminator
         self.__generator = generator
+        self.__loss_function = loss_function()
         self.__optimizer = optimizer(self.__generator.parameters(), lr=learning_rate)
-        self.__criterion = criterion
         self.__device = device
         self.__exports_path = exports_path
 
@@ -41,7 +42,7 @@ class GeneratorTrainer:
         generated_image_batch = self.__generator(static_image_batch)
 
         labels = self.__discriminator(generated_image_batch)
-        loss = self.__criterion(labels, torch.ones(size[0], 1).to(self.__device))
+        loss = self.__loss_function(labels, torch.ones(size[0], 1).to(self.__device))
 
         loss.backward()
         self.__optimizer.step()
