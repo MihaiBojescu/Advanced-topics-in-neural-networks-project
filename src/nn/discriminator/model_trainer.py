@@ -2,7 +2,9 @@ import time
 import torch
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
+from torch.autograd import Variable, grad
 from torch.optim import Optimizer
+
 
 class DiscriminatorTrainer:
     __discriminator: Module
@@ -44,15 +46,17 @@ class DiscriminatorTrainer:
         fake_image_target = fake_image_target.to(device=self.__device, non_blocking=self.__device == "cuda")
 
         self.__optimizer.zero_grad()
-        real_image_result = self.__discriminator(x=real_image)
-        fake_image_result = self.__discriminator(x=fake_image)
-        loss = self.__loss_function(fake_image_result, fake_image_target) - self.__loss_function(
-            real_image_result, real_image_target
+
+        real_image_discriminated = self.__discriminator(x=real_image)
+        fake_image_discriminated = self.__discriminator(x=fake_image)
+
+        discriminator_loss = self.__loss_function(
+            real_image, fake_image, real_image_discriminated, fake_image_discriminated
         )
-        loss.backward()
+        discriminator_loss.backward()
         self.__optimizer.step()
 
-        return loss
+        return discriminator_loss
 
     def export(self) -> None:
         torch.save(self.__discriminator.state_dict(), f"{self.__exports_path}/discriminator_{time.time_ns()}.pt")
