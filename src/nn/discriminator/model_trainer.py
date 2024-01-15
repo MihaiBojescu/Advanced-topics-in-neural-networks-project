@@ -2,7 +2,6 @@ import time
 import torch
 from torch.nn import Module
 from torch.nn.modules.loss import _Loss
-from torch.autograd import Variable, grad
 from torch.optim import Optimizer
 
 
@@ -32,26 +31,30 @@ class DiscriminatorTrainer:
 
         self.__loss_function = self.__loss_function.to(device=self.__device, non_blocking=self.__device == "cuda")
 
-    def run(self, real_image: torch.Tensor) -> torch.Tensor:
+    def run(self, real_image_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()
         self.__generator.eval()
 
-        fake_image = self.__generator(x=torch.rand(real_image.shape))
-        real_image_target = torch.zeros((real_image.shape[0], 1)).fill_(0.85)
-        fake_image_target = torch.zeros((real_image.shape[0], 1)).fill_(0.00)
+        fake_image_batch = self.__generator(x=torch.rand(real_image_batch.shape))
+        real_image_batch_target = torch.zeros((real_image_batch.shape[0], 1)).fill_(0.85)
+        fake_image_batch_target = torch.zeros((real_image_batch.shape[0], 1)).fill_(0.00)
 
-        real_image = real_image.to(device=self.__device, non_blocking=self.__device == "cuda")
-        fake_image = fake_image.to(device=self.__device, non_blocking=self.__device == "cuda")
-        real_image_target = real_image_target.to(device=self.__device, non_blocking=self.__device == "cuda")
-        fake_image_target = fake_image_target.to(device=self.__device, non_blocking=self.__device == "cuda")
+        real_image_batch = real_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
+        fake_image_batch = fake_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
+        real_image_batch_target = real_image_batch_target.to(
+            device=self.__device, non_blocking=self.__device == "cuda"
+        )
+        fake_image_batch_target = fake_image_batch_target.to(
+            device=self.__device, non_blocking=self.__device == "cuda"
+        )
 
         self.__optimizer.zero_grad()
 
-        real_image_discriminated = self.__discriminator(x=real_image)
-        fake_image_discriminated = self.__discriminator(x=fake_image)
+        real_image_batch_discriminated = self.__discriminator(x=real_image_batch)
+        fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
         discriminator_loss = self.__loss_function(
-            real_image, fake_image, real_image_discriminated, fake_image_discriminated
+            real_image_batch, fake_image_batch, real_image_batch_discriminated, fake_image_batch_discriminated
         )
         discriminator_loss.backward()
         self.__optimizer.step()
