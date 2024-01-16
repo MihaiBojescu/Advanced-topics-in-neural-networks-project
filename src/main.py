@@ -14,7 +14,7 @@ from nn.generator.model import Generator
 from nn.generator.model_trainer import GeneratorTrainer
 from nn.util.sampler import Sampler
 
-wandb_project_name = "RN.Monet.GANs"
+wandb_project_name = "RN.Monet.GANs.2"
 wandb_sweep_config = {
     "method": "bayes",
     "metric": {"name": "summed_loss", "goal": "minimize"},
