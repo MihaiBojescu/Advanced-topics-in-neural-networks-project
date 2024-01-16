@@ -34,7 +34,7 @@ class GeneratorTrainer:
         self.__device = device
 
     def run(self, size: torch.Size) -> torch.Tensor:
-        self.__discriminator.eval()
+        self.__discriminator.train()
         self.__generator.train()
 
         self.__optimizer.zero_grad()
@@ -44,7 +44,6 @@ class GeneratorTrainer:
 
         labels = self.__discriminator(generated_image_batch)
         loss = self.__loss_function(labels, torch.ones(size[0], 1).to(self.__device))
-
         loss.backward()
         self.__optimizer.step()
 
