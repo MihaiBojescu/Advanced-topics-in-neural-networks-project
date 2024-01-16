@@ -63,27 +63,27 @@ signature in the pictures that the GAN produces, effectively creating a 'digital
 the role of an art critic and an artist in order to improve itself until - as an art critic - it cannot distinguish between
 real, pre-existing art and newly created art.
 
-\section{Data processing}
-    In our project, we have used only a resize transformation, which resizes the images from 256x256 to 32x32.
-
 \section{GANs}
-    Generative Adversarial Networks, a type of Neural Network that was originally built in 2014 by Ian Goodfellow and his
+Generative Adversarial Networks, a type of Neural Network that was originally built in 2014 by Ian Goodfellow and his
 colleagues in June 2014 \cite{b1} is a type of machine learning system that involves two neural networks competing against
 each other. The competition can be seen a game where two teams have to play a zero-sum game: one team's win is the other
 team's loss. The system is part of the unsupervised learning category, but can also be used for semi-supervised learning,
 fully-supervised learning and for reinforcement learning. The alforementioned system can be used for a vast set of use-cases,
 ranging from image generation - the classical use-case - to music generation.
 
-    GANs are known to produce high-quality results with good performance, but suffer of low diversity.
+GANs are known to produce high-quality results with good performance, but suffer of low diversity.
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[scale=0.25]{images/generator problem.jpg}
+    \includegraphics[scale=0.15]{images/generator problem.jpg}
     \caption{Data generation problem} \label{Data generation problem}
 \end{figure}
 
-    In our paper, we present a classical use-case for GANs: image generation. As seed, we will be using random noise from
+In our paper, we present a classical use-case for GANs: image generation. As seed, we will be using random noise from
 the uniform distribution and we will use the seed to generate art in the Monet style.
+
+\subsection{Data processing}
+    In our project, we have used only a resize transformation, which resizes the images from 256x256 to 32x32.
 
 \subsection{Discriminator}
     For a discriminator, we will use a classical cone-shaped convolutional neural network that receives an image with 3 channels
@@ -125,13 +125,24 @@ For the activation function we also use the Leaky Rectified Linear Unit function
     loss_{G} = - \frac{\sum_{i=0}^{n} discriminator\_output_{fake\_image}^i}{n}
 \end{multline}
 
+\subsection{Tuning}
+    In order to tune our model, we have used Weights \& Biases and have performed multiple sweeps. We have used these sweeps
+to tune the parameters in order to reach the results specified in the Results (\ref{Results}) section. Most of our runs
+could show that the losses of the generator and discriminator converge quite fast to 0.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.15]{images/wandb.png}
+    \caption{Weights \& Biases run} \label{WandB run}
+\end{figure}
+
 \section{Shortfalls}
     GANs are well-known for being unstable in training, and are also well-known for suffering of the mode collapse problem -
 learning so well the training data of the discriminator, that it becomes a generator that outputs only the training data. In
 our case, the diversite issue was mitigated by using the gradient penalty function. The model proved to be highly unstable,
 most often outputting noise.
 
-\section{Results}
+\section{Results} \label{Results}
     In general, most of the results could not be distinguished from the random noise used to generate the generator's outputs
 (\ref{noisy sample}, \ref{noisy sample 2}). The red in the discriminator output means that the discriminator classified the
 output of the generator as a fake image. There were results where some shapes could be distinguished, but they were not close
