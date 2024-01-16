@@ -17,7 +17,9 @@ class GanTrainer:
     def __init__(
         self,
         discriminator_trainer: DiscriminatorTrainer,
+        discriminator_lr_scheduler,
         generator_trainer: GeneratorTrainer,
+        generator_lr_scheduler,
         generator_trainer_run_frequency: int,
         checkpoint_epoch_threshold: t.Optional[int] = None,
     ):
@@ -27,6 +29,8 @@ class GanTrainer:
         self.__checkpoint_epoch_threshold = checkpoint_epoch_threshold
         self.__best_discriminator_loss = None
         self.__best_generator_loss = None
+        self.__discriminator_lr_scheduler = discriminator_lr_scheduler
+        self.__generator_lr_scheduler = generator_lr_scheduler
 
     def run(self, epochs: int, batched_images_dataloader: DataLoader, log_callback):
         epoch_progress_bar = tqdm(range(epochs), desc="Training")
@@ -57,6 +61,9 @@ class GanTrainer:
             log_callback("discriminator_loss", discriminator_loss_total, epoch + 1)
             log_callback("generator_loss", generator_loss_total, epoch + 1)
             log_callback("summed_loss", summed_loss_total, epoch + 1)
+
+            self.__discriminator_lr_scheduler.step()
+            self.__generator_lr_scheduler.step()
 
         self.__discriminator_trainer.export()
         self.__generator_trainer.export()
