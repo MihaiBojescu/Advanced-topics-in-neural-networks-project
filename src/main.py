@@ -158,7 +158,7 @@ def train_with_hyperparams(
     cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
     batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-    gan_trainer.run(epochs, batched_image_dataloader, lambda key, value, epoch: {})#wandb.log({key: value}, step=epoch))
+    gan_trainer.run(epochs, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
 
     sample(discriminator=discriminator, generator=generator)
 
