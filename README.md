@@ -30,4 +30,20 @@ These models work together in the GAN framework, where the Generator tries to fo
 (To be updated)
 
 ## Usage
-(To be updated)
+
+The following needed:
+- the Monet jpeg dataset from Kaggle
+- a `data/datasets/monet_jpg` folder
+- a `data/cache` folder
+- a `data/exports` folder
+- a `data/samples` folder
+- a venv setup
+- the dependencies from `requirements.txt` installed in the venv
+- the venv should be activated
+
+The model can be run using the following command:
+```bash
+$ python3 ./src/main.py
+```
+
+Checkpoints will be exported to `wandb_exports`, while samples will be available in the `data/samples` folder.
