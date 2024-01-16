@@ -67,6 +67,50 @@ real, pre-existing art and newly created art.
 arts with artificial intelligence, to the creativity and the originality of said results. What would the implications of using
 such models in the industry of arts be? This paper also will explore the ethical implications of computer-generated craft.
 
+\section{GANs}
+    Generative Adversarial Networks, a type of Neural Network that was originally built in 2014 by Ian Goodfellow and his
+colleagues in June 2014 \cite{b1} is a type of machine learning system that involves two neural networks competing against
+each other. The competition can be seen a game where two teams have to play a zero-sum game: one team's win is the other
+team's loss. The system is part of the unsupervised learning category, but can also be used for semi-supervised learning,
+fully-supervised learning and for reinforcement learning. The alforementioned system can be used for a vast set of use-cases,
+ranging from image generation - the classical use-case - to music generation.
+
+    In our paper, we present a classical use-case for GANs: image generation. As seed, we will be using random noise from
+the uniform distribution and we will use the seed to generate art in the Monet style.
+
+\section{Discriminator}
+    For a discriminator, we will use a classical cone-shaped convolutional neural network that receives an image with 3 channels
+and in turn creates, 64, 128, 256, 512 feature maps, which are later flattened to a 1-dimensional array. The network makes use
+of a Leaky Rectified Linear Unit activation function for the feature maps building, and a Sigmoid activation function at its
+output.
+
+    The trainer of the discriminator uses - for each time it is used - a batch of real images and a batch of fake ones, which are used
+to ``teach'' the model how to classify images: fake ones are considered negative, while real ones as positive. For training we use
+the Wasserstein distance - also named Earth Mover's distance - to compute the loss of the discriminator:
+
+\begin{multline}
+    loss_{D} = - \frac{\sum_{i=0}^{n} real\_output^i}{n} \\
+               + \frac{\sum_{i=0}^{n} fake\_output^i}{n} \\
+               + gradient\_loss(fake\_image, real\_image)
+\end{multline}
+
+    Where $gradient\_loss$ is a function that computes, given a real and a fake image, a penalty that encourages the gradients
+of the critic to have norm 1 almost everywhere. This is used in order to enforce the Lipschitz continuity constraint, which
+in turn should improve the results.
+
+\section{Generator}
+    The generator of the GAN is comprised of a classical U-Net architectured CNN. U-Nets are well known for producing pictures
+with the same shape as the input, which in our case proved beneficial, as we could provide noise for each pixel of the image,
+noise. After training, the generator can output realistic-looking Monet-inspired pictures.
+
+    The generator uses multiple layers of convolutional and max-pooling layers that downscale the image and extract features,
+data which is later used to upscale the image back using multiple transposed convolutional and classical convolutional layers.
+For the activation function we also use the Leaky Rectified Linear Unit function.
+
+\section{Shortfalls}
+    GANs are well-known for being unstable in training, and are also well-known for suffering of the mode collapse problem -
+learning so well the training data of the discriminator, that it becomes a generator that outputs only the training data.
+
 \begin{thebibliography}{00}
     \bibitem{b1} I. J. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, Y. Bengie
     (2014). ``Generative Adversarial Nets''. Département d'informatique et de recherche opérationnelle Université de Montréal
