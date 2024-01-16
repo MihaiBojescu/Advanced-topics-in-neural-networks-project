@@ -12,48 +12,34 @@ from nn.discriminator.model import Discriminator
 from nn.discriminator.model_trainer import DiscriminatorTrainer
 from nn.generator.model import Generator
 from nn.generator.model_trainer import GeneratorTrainer
+from nn.util.sampler import Sampler
 
 wandb_project_name = "RN.Monet.GANs"
 wandb_sweep_config = {
-    'method': 'bayes',
-    'metric': {
-        'name': 'summed_loss',
-        'goal': 'minimize'
+    "method": "bayes",
+    "metric": {"name": "summed_loss", "goal": "minimize"},
+    "parameters": {
+        "discriminator_learning_rate": {"min": 0.00001, "max": 0.01},
+        "generator_learning_rate": {"min": 0.00001, "max": 0.01},
+        "generator_trainer_run_frequency": {"min": 1, "max": 20},
+        "batch_size": {"values": [32, 64, 128]},
+        "gradient_penalty_rate": {"min": 5, "max": 15},
     },
-    'parameters': {
-        'discriminator_learning_rate': {
-            'min': 0.00001,
-            'max': 0.01
-        },
-        'generator_learning_rate': {
-            'min': 0.00001,
-            'max': 0.01
-        },
-        'generator_trainer_run_frequency': {
-            'min': 1,
-            'max': 20
-        },
-        'batch_size': {
-            'values': [32, 64, 128]
-        },
-        'gradient_penalty_rate': {
-            'min': 5,
-            'max': 15
-        }
-    }
 }
+
 
 def main():
     wandb.login()
     sweep_id = wandb.sweep(wandb_sweep_config, project=wandb_project_name)
-    wandb.agent(sweep_id, function=wandb_run) 
+    wandb.agent(sweep_id, function=wandb_run)
+
 
 def wandb_run():
-    with wandb.init():
-        device = get_default_device()
-        generator = Generator(device=device)
-        discriminator = Discriminator(device=device)
+    device = get_default_device()
+    generator = Generator(device=device)
+    discriminator = Discriminator(device=device)
 
+    with wandb.init():
         # vars
         discriminator_learning_rate = wandb.config.discriminator_learning_rate
         generator_learning_rate = wandb.config.generator_learning_rate
@@ -61,12 +47,16 @@ def wandb_run():
         batch_size = wandb.config.batch_size
         gradient_penalty_rate = wandb.config.gradient_penalty_rate
 
-        discriminator_loss_function = lambda: WassersteinWithGradientPenaltyLoss(
+        discriminator_loss_function = WassersteinWithGradientPenaltyLoss(
             discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
         )
-        discriminator_optimizer = torch.optim.Adam
-        generator_loss_function = WassersteinLoss
-        generator_optimizer = torch.optim.Adam
+        discriminator_optimizer = torch.optim.Adam(
+            params=discriminator.parameters(), lr=discriminator_learning_rate, betas=(0.9, 0.99)
+        )
+        generator_loss_function = WassersteinLoss()
+        generator_optimizer = torch.optim.Adam(
+            params=generator.parameters(), lr=generator_learning_rate, betas=(0.9, 0.99)
+        )
 
         discriminator_trainer = DiscriminatorTrainer(
             device=device,
@@ -74,8 +64,7 @@ def wandb_run():
             generator=generator,
             loss_function=discriminator_loss_function,
             optimizer=discriminator_optimizer,
-            learning_rate=discriminator_learning_rate,
-            exports_path="./wandb_exports"
+            exports_path="./wandb_exports",
         )
 
         generator_trainer = GeneratorTrainer(
@@ -84,31 +73,38 @@ def wandb_run():
             generator=generator,
             optimizer=generator_optimizer,
             loss_function=generator_loss_function,
-            learning_rate=generator_learning_rate,
-            exports_path="./wandb_exports"
+            exports_path="./wandb_exports",
         )
 
         gan_trainer = GanTrainer(
             discriminator_trainer=discriminator_trainer,
             generator_trainer=generator_trainer,
             generator_trainer_run_frequency=generator_trainer_run_frequency,
-            checkpoint_epoch_threshold=101
+            checkpoint_epoch_threshold=101,
         )
 
-
         # Resize transform will be used to test the model. Will be removed afterwards.
-        transforms = Compose([
-            Resize([32, 32]),
-            RandomHorizontalFlip(),
-            RandomVerticalFlip(),
-            ToDtype(torch.float32, scale=True)
-        ])
+        transforms = Compose(
+            [Resize([32, 32]), RandomHorizontalFlip(), RandomVerticalFlip(), ToDtype(torch.float32, scale=True)]
+        )
 
         dataset = ImageDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
-        batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size)
+        batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-        gan_trainer.run(100, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+        gan_trainer.run(50, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+
+    sample(discriminator=discriminator, generator=generator)
+
+
+def sample(discriminator: Discriminator, generator: Generator):
+    sampler = Sampler(good_sample_threshold=0.85, samples_path="./data/samples")
+    noise = torch.rand((4, 3, 32, 32))
+
+    fake_images = generator(noise)
+    fake_images_discriminated = discriminator(fake_images)
+
+    sampler.sample(noise, fake_images, fake_images_discriminated)
 
 
 if __name__ == "__main__":

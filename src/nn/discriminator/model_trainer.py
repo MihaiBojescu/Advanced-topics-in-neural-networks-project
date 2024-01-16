@@ -19,14 +19,13 @@ class DiscriminatorTrainer:
         generator: Module,
         loss_function: _Loss,
         optimizer: Optimizer,
-        learning_rate: float,
         device: torch.device = torch.device("cpu"),
         exports_path: str = "/tmp",
     ) -> None:
         self.__discriminator = discriminator
         self.__generator = generator
-        self.__loss_function = loss_function()
-        self.__optimizer = optimizer(self.__discriminator.parameters(), lr=learning_rate)
+        self.__loss_function = loss_function
+        self.__optimizer = optimizer
         self.__device = device
         self.__exports_path = exports_path
 

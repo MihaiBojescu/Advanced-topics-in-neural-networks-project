@@ -21,13 +21,12 @@ class GeneratorTrainer:
         loss_function: _Loss,
         optimizer: torch.optim.Optimizer,
         device: torch.device,
-        learning_rate: float,
         exports_path: str = "/tmp",
     ) -> None:
         self.__discriminator = discriminator
         self.__generator = generator
-        self.__loss_function = loss_function()
-        self.__optimizer = optimizer(self.__generator.parameters(), lr=learning_rate)
+        self.__loss_function = loss_function
+        self.__optimizer = optimizer
         self.__device = device
         self.__exports_path = exports_path
 
