@@ -41,7 +41,7 @@ class GanTrainer:
                 discriminator_loss = self.__discriminator_trainer.run(real_image_batch=image_batch)
                 self.__add_discriminator_checkpoint(epoch=epoch, loss=discriminator_loss)
 
-                if batch_index % self.__generator_trainer_run_frequency != 0:
+                if batch_index == 0 and batch_index % self.__generator_trainer_run_frequency != 0:
                     continue
 
                 generator_loss = self.__generator_trainer.run(batch_size=image_batch.shape[0])

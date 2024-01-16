@@ -26,8 +26,8 @@ class WassersteinWithGradientPenaltyLoss:
         fake_image_discriminated: torch.Tensor,
     ) -> torch.Tensor:
         return (
-            - fake_image_discriminated.mean()
-            + real_image_discriminated.mean()
+            - real_image_discriminated.mean()
+            + fake_image_discriminated.mean()
             + self.__gradient_penalty(real_image=real_image, fake_image=fake_image)
         )
 
