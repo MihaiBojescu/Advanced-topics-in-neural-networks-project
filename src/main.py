@@ -102,12 +102,12 @@ def wandb_run():
 
 def sample(discriminator: Discriminator, generator: Generator):
     sampler = Sampler(good_sample_threshold=0.85, samples_path="./data/samples")
-    noise = torch.rand((4, 3, 32, 32))
+    noise = torch.rand((4, 100, 1, 1))
 
     fake_images = generator(noise)
     fake_images_discriminated = discriminator(fake_images)
 
-    sampler.sample(noise, fake_images, fake_images_discriminated)
+    sampler.sample(fake_images, fake_images_discriminated)
 
 
 if __name__ == "__main__":

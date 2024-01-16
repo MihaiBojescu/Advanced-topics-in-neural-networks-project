@@ -32,21 +32,21 @@ class GeneratorTrainer:
 
         self.__device = device
 
-    def run(self, size: torch.Size) -> torch.Tensor:
+    def run(self, batch_size: torch.Size) -> torch.Tensor:
         self.__discriminator.train()
         self.__generator.train()
-
         self.__optimizer.zero_grad()
 
-        static_image_batch = torch.rand(size).to(self.__device)
-        generated_image_batch = self.__generator(static_image_batch)
+        static_image_batch = torch.rand((batch_size, 100, 1, 1))
+        static_image_batch = static_image_batch.to(self.__device)
+        fake_image_batch = self.__generator(x=static_image_batch)
+        fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
-        labels = self.__discriminator(generated_image_batch)
-        loss = self.__loss_function(labels, torch.ones(size[0], 1).to(self.__device))
-        loss.backward()
+        generator_loss = self.__loss_function(fake_image_batch_discriminated).to(self.__device)
+        generator_loss.backward()
         self.__optimizer.step()
 
-        return loss
+        return generator_loss
 
     def export(self) -> None:
         os.makedirs(self.__exports_path, exist_ok=True)
