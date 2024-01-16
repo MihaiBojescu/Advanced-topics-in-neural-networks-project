@@ -32,14 +32,12 @@ class GeneratorTrainer:
 
         self.__device = device
 
-    def run(self, batch_size: torch.Size) -> torch.Tensor:
+    def run(self, noise_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()
         self.__generator.train()
         self.__optimizer.zero_grad()
 
-        static_image_batch = torch.rand((batch_size, 100, 1, 1))
-        static_image_batch = static_image_batch.to(self.__device)
-        fake_image_batch = self.__generator(x=static_image_batch)
+        fake_image_batch = self.__generator(x=noise_batch)
         fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
         generator_loss = self.__loss_function(fake_image_batch_discriminated).to(self.__device)

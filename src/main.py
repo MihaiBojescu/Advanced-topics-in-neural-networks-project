@@ -24,6 +24,7 @@ wandb_sweep_config = {
         "generator_trainer_run_frequency": {"min": 4, "max": 6},
         "batch_size": {"values": [16, 32, 64]},
         "gradient_penalty_rate": {"min": 9, "max": 11},
+        "epochs": {"min": 10, "max": 100},
     },
 }
 
@@ -46,6 +47,7 @@ def wandb_run():
         generator_trainer_run_frequency = wandb.config.generator_trainer_run_frequency
         batch_size = wandb.config.batch_size
         gradient_penalty_rate = wandb.config.gradient_penalty_rate
+        epochs = wandb.config.epochs
 
         discriminator_loss_function = WassersteinWithGradientPenaltyLoss(
             discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
@@ -95,7 +97,7 @@ def wandb_run():
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
         batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-        gan_trainer.run(100, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+        gan_trainer.run(epochs, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
 
     sample(discriminator=discriminator, generator=generator)
 

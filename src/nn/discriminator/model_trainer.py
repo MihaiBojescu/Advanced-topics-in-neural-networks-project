@@ -29,12 +29,11 @@ class DiscriminatorTrainer:
         self.__device = device
         self.__exports_path = exports_path
 
-    def run(self, real_image_batch: torch.Tensor) -> torch.Tensor:
+    def run(self, real_image_batch: torch.Tensor, noise_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()
         self.__generator.train()
         self.__optimizer.zero_grad()
 
-        noise_batch = torch.rand((real_image_batch.shape[0], 100, 1, 1))
         fake_image_batch = self.__generator(x=noise_batch)
         real_image_batch = real_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
         fake_image_batch = fake_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
