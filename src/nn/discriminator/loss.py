@@ -48,6 +48,6 @@ class WassersteinWithGradientPenaltyLoss:
             retain_graph=True,
         )
         gradient = gradients[0].view(batch_size, -1)
-        gradient_norm = torch.sqrt(torch.sum(gradient**2, dim=1) + torch.finfo(real_image.dtype).eps)
+        gradient = torch.sqrt(torch.sum(gradient**2, dim=1) + 1e-12)
 
-        return self.__gradient_penalty_rate * ((gradient_norm - 1) ** 2).mean()
+        return self.__gradient_penalty_rate * ((gradient - 1) ** 2).mean()

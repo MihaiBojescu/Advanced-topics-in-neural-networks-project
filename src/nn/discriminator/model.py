@@ -19,7 +19,7 @@ class Discriminator(torch.nn.Module):
         self.__batch_norm_4 = torch.nn.BatchNorm2d(512, device=device)
         self.__conv_5 = torch.nn.Conv2d(512, 1, kernel_size=2, stride=1, padding=0, device=device)
 
-        self.__activation_function = torch.nn.ReLU()
+        self.__activation_function = torch.nn.LeakyReLU(0.2, True)
         self.__output_activation_function = torch.nn.Sigmoid()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

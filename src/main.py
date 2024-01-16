@@ -1,6 +1,6 @@
 import wandb
 import torch
-from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip, ToDtype
+from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip, ToDtype, Lambda
 from torch.utils.data.dataloader import DataLoader
 from nn.dataset.cacheable_tensor_dataset import CacheableTensorDataset
 from nn.discriminator.loss import WassersteinWithGradientPenaltyLoss
@@ -19,10 +19,10 @@ wandb_sweep_config = {
     "method": "bayes",
     "metric": {"name": "summed_loss", "goal": "minimize"},
     "parameters": {
-        "discriminator_learning_rate": {"min": 0.00001, "max": 0.01},
-        "generator_learning_rate": {"min": 0.00001, "max": 0.01},
+        "discriminator_learning_rate": {"min": 0.00001, "max": 0.001},
+        "generator_learning_rate": {"min": 0.00001, "max": 0.001},
         "generator_trainer_run_frequency": {"min": 1, "max": 20},
-        "batch_size": {"values": [64, 128, 256]},
+        "batch_size": {"values": [32, 64, 128, 256]},
         "gradient_penalty_rate": {"min": 5, "max": 15},
     },
 }
@@ -51,11 +51,11 @@ def wandb_run():
             discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
         )
         discriminator_optimizer = torch.optim.Adam(
-            params=discriminator.parameters(), lr=discriminator_learning_rate, betas=(0.9, 0.99)
+            params=discriminator.parameters(), lr=discriminator_learning_rate,
         )
         generator_loss_function = WassersteinLoss()
         generator_optimizer = torch.optim.Adam(
-            params=generator.parameters(), lr=generator_learning_rate, betas=(0.9, 0.99)
+            params=generator.parameters(), lr=generator_learning_rate
         )
 
         discriminator_trainer = DiscriminatorTrainer(
@@ -85,14 +85,17 @@ def wandb_run():
 
         # Resize transform will be used to test the model. Will be removed afterwards.
         transforms = Compose(
-            [Resize([32, 32]), RandomHorizontalFlip(), RandomVerticalFlip(), ToDtype(torch.float32, scale=True)]
+            [
+                Resize([32, 32]),
+                ToDtype(torch.float32, scale=True),
+            ]
         )
 
         dataset = ImageDataset(data_path="./data/datasets/monet_jpg", transforms=transforms)
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
         batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-        gan_trainer.run(50, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+        gan_trainer.run(200, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
 
     sample(discriminator=discriminator, generator=generator)
 
