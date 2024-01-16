@@ -63,9 +63,8 @@ signature in the pictures that the GAN produces, effectively creating a 'digital
 the role of an art critic and an artist in order to improve itself until - as an art critic - it cannot distinguish between
 real, pre-existing art and newly created art.
 
-    During the building of this model, several intriguing questions were raised, ranging from the possibility of intersecting
-arts with artificial intelligence, to the creativity and the originality of said results. What would the implications of using
-such models in the industry of arts be? This paper also will explore the ethical implications of computer-generated craft.
+\section{Data processing}
+    In our project, we have used only a resize transformation, which resizes the images from 256x256 to 32x32.
 
 \section{GANs}
     Generative Adversarial Networks, a type of Neural Network that was originally built in 2014 by Ian Goodfellow and his
@@ -75,10 +74,18 @@ team's loss. The system is part of the unsupervised learning category, but can a
 fully-supervised learning and for reinforcement learning. The alforementioned system can be used for a vast set of use-cases,
 ranging from image generation - the classical use-case - to music generation.
 
+    GANs are known to produce high-quality results with good performance, but suffer of low diversity.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.25]{images/generator problem.jpg}
+    \caption{Data generation problem} \label{Data generation problem}
+\end{figure}
+
     In our paper, we present a classical use-case for GANs: image generation. As seed, we will be using random noise from
 the uniform distribution and we will use the seed to generate art in the Monet style.
 
-\section{Discriminator}
+\subsection{Discriminator}
     For a discriminator, we will use a classical cone-shaped convolutional neural network that receives an image with 3 channels
 and in turn creates, 64, 128, 256, 512 feature maps, which are later flattened to a 1-dimensional array. The network makes use
 of a Leaky Rectified Linear Unit activation function for the feature maps building, and a Sigmoid activation function at its
@@ -86,11 +93,11 @@ output.
 
     The trainer of the discriminator uses - for each time it is used - a batch of real images and a batch of fake ones, which are used
 to ``teach'' the model how to classify images: fake ones are considered negative, while real ones as positive. For training we use
-the Wasserstein distance - also named Earth Mover's distance - to compute the loss of the discriminator:
+the Wasserstein distance - also named Earth Mover's distance - to compute the loss of the discriminator \cite{b2}:
 
 \begin{multline}
-    loss_{D} = - \frac{\sum_{i=0}^{n} real\_output^i}{n} \\
-               + \frac{\sum_{i=0}^{n} fake\_output^i}{n} \\
+    loss_{D} = - \frac{\sum_{i=0}^{n} discriminator\_output_{real\_image}^i}{n} \\
+               + \frac{\sum_{i=0}^{n} discriminator\_output_{fake\_image}^i}{n} \\
                + gradient\_loss(fake\_image, real\_image)
 \end{multline}
 
@@ -98,23 +105,84 @@ the Wasserstein distance - also named Earth Mover's distance - to compute the lo
 of the critic to have norm 1 almost everywhere. This is used in order to enforce the Lipschitz continuity constraint, which
 in turn should improve the results.
 
-\section{Generator}
+\subsection{Generator}
     The generator of the GAN is comprised of a classical U-Net architectured CNN. U-Nets are well known for producing pictures
 with the same shape as the input, which in our case proved beneficial, as we could provide noise for each pixel of the image,
-noise. After training, the generator can output realistic-looking Monet-inspired pictures.
+noise. After training, the generator \textit{should} output realistic-looking Monet-inspired pictures.
 
-    The generator uses multiple layers of convolutional and max-pooling layers that downscale the image and extract features,
+    For its architecture, we used multiple layers of convolutional and max-pooling layers that downscale the image and extract features,
 data which is later used to upscale the image back using multiple transposed convolutional and classical convolutional layers.
 For the activation function we also use the Leaky Rectified Linear Unit function.
 
+    The trainer performs the following steps for the generator:
+\begin{enumerate}
+    \item Using a given noise tensor, run the generator
+    \item Using the output of the generator, run the discriminator
+    \item Use the inverted results of the discriminator to update the loss of the generator
+\end{enumerate}
+
+\begin{multline}
+    loss_{G} = - \frac{\sum_{i=0}^{n} discriminator\_output_{fake\_image}^i}{n}
+\end{multline}
+
 \section{Shortfalls}
     GANs are well-known for being unstable in training, and are also well-known for suffering of the mode collapse problem -
-learning so well the training data of the discriminator, that it becomes a generator that outputs only the training data.
+learning so well the training data of the discriminator, that it becomes a generator that outputs only the training data. In
+our case, the diversite issue was mitigated by using the gradient penalty function. The model proved to be highly unstable,
+most often outputting noise.
+
+\section{Results}
+    In general, most of the results could not be distinguished from the random noise used to generate the generator's outputs
+(\ref{noisy sample}, \ref{noisy sample 2}). The red in the discriminator output means that the discriminator classified the
+output of the generator as a fake image. There were results where some shapes could be distinguished, but they were not close
+to the original paintings (\ref{sample with shape}, \ref{sample with shape 2}).
+
+    We trained our model on an Intel Core i7 1260p processor, a NVIDIA RTX 3070Ti laptop GPU and a NVIDIA T4 GPU in the cloud.
+We collected the following metrics from our training runs:
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Processor & Mean timing per iteration \\
+        \hline
+        Intel i7 1260p & 12s \\
+        NVIDIA RTX 3070Ti & 1.3s \\
+        NVIDIA T4 & 1.83s \\
+        \hline
+    \end{tabular}
+    \caption{Performance metrics} \label{performance metrics}
+\end{table}
+
+\section{Conclusions}
+    In literrature, GANs can be used to generate art from random noise. In our project we aimed to replicate these results,
+but at best we could generate only shaped artifacts. The model would need further debugging and fine-tuning before it can
+generate meaningful data.
 
 \begin{thebibliography}{00}
     \bibitem{b1} I. J. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, Y. Bengie
     (2014). ``Generative Adversarial Nets''. Département d'informatique et de recherche opérationnelle Université de Montréal
     Montréal, QC H3C 3J7. arXiv: 1406.2661v1
+    \bibitem{b2} M. Arjovsky, S. Chintala, L. Bottou (2017). ``Wasserstein GAN''. Courant Institute of Mathematical Sciences.
+    arXiv: 1701.07875v3
 \end{thebibliography}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.20]{images/noisy sample.jpg}
+    \caption{Noisy sample} \label{noisy sample}
+    \centering
+    \includegraphics[scale=0.20]{images/noisy sample 2.jpg}
+    \caption{Noisy sample 2} \label{noisy sample 2}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[scale=0.15]{images/sample with shape.jpg}
+    \caption{Sample with shape} \label{sample with shape}
+    \centering
+    \includegraphics[scale=0.15]{images/sample with shape 2.jpg}
+    \caption{Sample with shape 2} \label{sample with shape 2}
+\end{figure}
 
 \end{document}
