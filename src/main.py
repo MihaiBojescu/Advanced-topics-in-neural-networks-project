@@ -22,7 +22,7 @@ wandb_sweep_config = {
         "discriminator_learning_rate": {"min": 0.00001, "max": 0.01},
         "generator_learning_rate": {"min": 0.00001, "max": 0.01},
         "generator_trainer_run_frequency": {"min": 1, "max": 20},
-        "batch_size": {"values": [32, 64, 128]},
+        "batch_size": {"values": [64, 128, 256]},
         "gradient_penalty_rate": {"min": 5, "max": 15},
     },
 }
