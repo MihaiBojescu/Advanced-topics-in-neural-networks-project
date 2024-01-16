@@ -27,14 +27,17 @@ https://www.kaggle.com/competitions/gan-getting-started/leaderboard
 
 ## Findings
 An odd thing we observed is that the Generator's training tends to quickly converge to an average loss close to 0, 10 or 20 per epoch. This usually happens starting epoch 10, to epoch 20.
+
 The Discriminator's loss is far more prone to change throughout the entire training duration. It usually starts with a high loss (50+) and gradually decreases.
+
 The Discriminator tends to perform far better than the Generator early on in the training, perhaps leading to the "stunted development" of the generator. We have attempted to get around this by modifying the generator_trainer_run_frequency value (the value representing how often the Generator trains in relation to the Discriminator), but alas we could not find a configuration that allows the Generator to properly develop. This suggests there might be another, yet unidentified, issue.
 
 ## Results
 Here you can see a few results. 
+
 The leftmost images are the seed static used to generate the image.
 The middle image is the generated image.
-THe left image represents the discriminator's verdict: green = Monet painting, red = not Monet.
+The left image represents the discriminator's verdict: green = Monet painting, red = not Monet.
 
 ![alt text](./example_generated_images/sample_1705370628244369913.jpg)
 ![alt text](./example_generated_images/sample_1705370648611655456.jpg)
