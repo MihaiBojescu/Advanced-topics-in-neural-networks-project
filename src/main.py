@@ -19,11 +19,12 @@ wandb_sweep_config = {
     "method": "bayes",
     "metric": {"name": "summed_loss", "goal": "minimize"},
     "parameters": {
-        "discriminator_learning_rate": {"min": 0.00001, "max": 0.001},
-        "generator_learning_rate": {"min": 0.00001, "max": 0.001},
-        "generator_trainer_run_frequency": {"min": 1, "max": 20},
-        "batch_size": {"values": [32, 64, 128, 256]},
-        "gradient_penalty_rate": {"min": 5, "max": 15},
+        "discriminator_learning_rate": {"min": 0.0001, "max": 0.0002},
+        "generator_learning_rate": {"min": 0.0001, "max": 0.0002},
+        "generator_trainer_run_frequency": {"min": 4, "max": 6},
+        "batch_size": {"values": [16, 32, 64]},
+        "gradient_penalty_rate": {"min": 9, "max": 11},
+        "epochs": {"min": 10, "max": 100},
     },
 }
 
@@ -46,16 +47,17 @@ def wandb_run():
         generator_trainer_run_frequency = wandb.config.generator_trainer_run_frequency
         batch_size = wandb.config.batch_size
         gradient_penalty_rate = wandb.config.gradient_penalty_rate
+        epochs = wandb.config.epochs
 
         discriminator_loss_function = WassersteinWithGradientPenaltyLoss(
             discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
         )
         discriminator_optimizer = torch.optim.Adam(
-            params=discriminator.parameters(), lr=discriminator_learning_rate,
+            params=discriminator.parameters(), lr=discriminator_learning_rate, betas=(0.5, 0.999)
         )
         generator_loss_function = WassersteinLoss()
         generator_optimizer = torch.optim.Adam(
-            params=generator.parameters(), lr=generator_learning_rate
+            params=generator.parameters(), lr=generator_learning_rate, betas=(0.5, 0.999)
         )
 
         discriminator_trainer = DiscriminatorTrainer(
@@ -86,7 +88,7 @@ def wandb_run():
         # Resize transform will be used to test the model. Will be removed afterwards.
         transforms = Compose(
             [
-                Resize([32, 32]),
+                Resize([64, 64]),
                 ToDtype(torch.float32, scale=True),
             ]
         )
@@ -95,19 +97,19 @@ def wandb_run():
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
         batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-        gan_trainer.run(200, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+        gan_trainer.run(epochs, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
 
     sample(discriminator=discriminator, generator=generator)
 
 
 def sample(discriminator: Discriminator, generator: Generator):
     sampler = Sampler(good_sample_threshold=0.85, samples_path="./data/samples")
-    noise = torch.rand((4, 3, 32, 32))
+    noise = torch.rand((4, 100, 1, 1))
 
     fake_images = generator(noise)
     fake_images_discriminated = discriminator(fake_images)
 
-    sampler.sample(noise, fake_images, fake_images_discriminated)
+    sampler.sample(fake_images, fake_images_discriminated)
 
 
 if __name__ == "__main__":

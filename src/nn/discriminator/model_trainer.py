@@ -29,19 +29,18 @@ class DiscriminatorTrainer:
         self.__device = device
         self.__exports_path = exports_path
 
-    def run(self, real_image_batch: torch.Tensor) -> torch.Tensor:
+    def run(self, real_image_batch: torch.Tensor, noise_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()
         self.__generator.train()
+        self.__optimizer.zero_grad()
 
-        fake_image_batch = self.__generator(x=torch.rand(real_image_batch.shape))
-
+        fake_image_batch = self.__generator(x=noise_batch)
         real_image_batch = real_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
         fake_image_batch = fake_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
 
         real_image_batch_discriminated = self.__discriminator(x=real_image_batch)
         fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
-        self.__optimizer.zero_grad()
         discriminator_loss = self.__loss_function(
             real_image_batch, fake_image_batch, real_image_batch_discriminated, fake_image_batch_discriminated
         )
