@@ -41,7 +41,7 @@ class GanTrainer:
             summed_loss_total = 0
 
             for batch_index, image_batch in enumerate(batched_images_dataloader):
-                noise_batch = torch.rand((image_batch.shape[0], 100, 1, 1))
+                noise_batch = torch.rand((image_batch.shape[0], 3, 64, 64))
 
                 discriminator_loss = self.__discriminator_trainer.run(
                     real_image_batch=image_batch, noise_batch=noise_batch

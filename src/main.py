@@ -1,6 +1,6 @@
 import wandb
 import torch
-from torchvision.transforms.v2 import Compose, Resize, RandomVerticalFlip, RandomHorizontalFlip, ToDtype, Lambda
+from torchvision.transforms.v2 import Compose, Resize, ToDtype
 from torch.utils.data.dataloader import DataLoader
 from nn.dataset.cacheable_tensor_dataset import CacheableTensorDataset
 from nn.discriminator.loss import WassersteinWithGradientPenaltyLoss
@@ -165,7 +165,7 @@ def train_with_hyperparams(
 
 def sample(discriminator: Discriminator, generator: Generator):
     sampler = Sampler(good_sample_threshold=0.85, samples_path="./data/samples/lr_scheduling")
-    noise = torch.rand((4, 100, 1, 1))
+    noise = torch.rand((4, 3, 64, 64))
 
     fake_images = generator(noise)
     fake_images_discriminated = discriminator(fake_images)
