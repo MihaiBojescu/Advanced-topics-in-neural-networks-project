@@ -19,11 +19,11 @@ wandb_sweep_config = {
     "method": "bayes",
     "metric": {"name": "summed_loss", "goal": "minimize"},
     "parameters": {
-        "discriminator_learning_rate": {"min": 0.00001, "max": 0.001},
-        "generator_learning_rate": {"min": 0.00001, "max": 0.001},
-        "generator_trainer_run_frequency": {"min": 1, "max": 20},
-        "batch_size": {"values": [32, 64, 128, 256]},
-        "gradient_penalty_rate": {"min": 5, "max": 15},
+        "discriminator_learning_rate": {"min": 0.0001, "max": 0.0002},
+        "generator_learning_rate": {"min": 0.0001, "max": 0.0002},
+        "generator_trainer_run_frequency": {"min": 4, "max": 6},
+        "batch_size": {"values": [16, 32, 64]},
+        "gradient_penalty_rate": {"min": 9, "max": 11},
     },
 }
 
@@ -51,11 +51,11 @@ def wandb_run():
             discriminator=discriminator, gradient_penalty_rate=gradient_penalty_rate, device=device
         )
         discriminator_optimizer = torch.optim.Adam(
-            params=discriminator.parameters(), lr=discriminator_learning_rate,
+            params=discriminator.parameters(), lr=discriminator_learning_rate, betas=(0.5, 0.999)
         )
         generator_loss_function = WassersteinLoss()
         generator_optimizer = torch.optim.Adam(
-            params=generator.parameters(), lr=generator_learning_rate
+            params=generator.parameters(), lr=generator_learning_rate, betas=(0.5, 0.999)
         )
 
         discriminator_trainer = DiscriminatorTrainer(
@@ -86,7 +86,7 @@ def wandb_run():
         # Resize transform will be used to test the model. Will be removed afterwards.
         transforms = Compose(
             [
-                Resize([32, 32]),
+                Resize([64, 64]),
                 ToDtype(torch.float32, scale=True),
             ]
         )
@@ -95,7 +95,7 @@ def wandb_run():
         cached_dataset = CacheableTensorDataset(dataset=dataset, cache=True)
         batched_image_dataloader = DataLoader(dataset=cached_dataset, batch_size=batch_size, shuffle=True)
 
-        gan_trainer.run(200, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
+        gan_trainer.run(100, batched_image_dataloader, lambda key, value, epoch: wandb.log({key: value}, step=epoch))
 
     sample(discriminator=discriminator, generator=generator)
 
