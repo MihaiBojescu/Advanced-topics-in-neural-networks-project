@@ -37,7 +37,7 @@ Here you can see a few results.
 
 The leftmost images are the seed static used to generate the image.
 The middle image is the generated image.
-The left image represents the discriminator's verdict: green = Monet painting, red = not Monet.
+The rightmost image represents the discriminator's verdict: green = Monet painting, red = not Monet.
 
 ![alt text](./example_generated_images/sample_1705370628244369913.jpg)
 ![alt text](./example_generated_images/sample_1705370648611655456.jpg)
