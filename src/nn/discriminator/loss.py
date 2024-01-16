@@ -33,7 +33,8 @@ class WassersteinWithGradientPenaltyLoss:
 
     def __gradient_penalty(self, real_image: torch.Tensor, fake_image: torch.Tensor):
         batch_size = real_image.shape[0]
-        alpha = torch.rand(real_image.shape, device=self.__device)
+        alpha = torch.rand(batch_size, 1, 1, 1).to(device=self.__device)
+        alpha = alpha.expand_as(real_image).to(device=self.__device)
         interpolation = Variable(alpha * real_image + (1 - alpha) * fake_image, requires_grad=True).to(
             device=self.__device
         )

@@ -32,27 +32,17 @@ class DiscriminatorTrainer:
 
     def run(self, real_image_batch: torch.Tensor) -> torch.Tensor:
         self.__discriminator.train()
-        self.__generator.eval()
+        self.__generator.train()
 
         fake_image_batch = self.__generator(x=torch.rand(real_image_batch.shape))
-        real_image_batch_target = torch.zeros((real_image_batch.shape[0], 1)).fill_(0.85)
-        fake_image_batch_target = torch.zeros((real_image_batch.shape[0], 1)).fill_(0.00)
-
         real_image_batch = real_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
         fake_image_batch = fake_image_batch.to(device=self.__device, non_blocking=self.__device == "cuda")
-        real_image_batch_target = real_image_batch_target.to(
-            device=self.__device, non_blocking=self.__device == "cuda"
-        )
-        fake_image_batch_target = fake_image_batch_target.to(
-            device=self.__device, non_blocking=self.__device == "cuda"
-        )
-
-        self.__optimizer.zero_grad()
 
         real_image_batch_discriminated = self.__discriminator(x=real_image_batch)
         fake_image_batch_discriminated = self.__discriminator(x=fake_image_batch)
 
         # Uncomment if wasserstein distance with gradient penalty loss will be used
+        self.__optimizer.zero_grad()
         discriminator_loss = self.__loss_function(
             real_image_batch, fake_image_batch, real_image_batch_discriminated, fake_image_batch_discriminated
         )
